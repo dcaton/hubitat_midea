@@ -28,11 +28,13 @@ metadata
     definition(name: "Midea AC local controller", namespace: "tomw", author: "tomw", importUrl: "")
     {
         attribute "outdoorTemperature", "number"
+        attribute "thermostatOperatingState", "enum", ["on", "off"]  //override built-in definiton with different enum values so Rule Manager shows correct choices
         
         capability "Configuration"
         capability "Initialize"
         capability "Refresh"
         capability "Thermostat"
+        capability "TemperatureMeasurement"
         
         command "dry"
         command "fan_only"
@@ -506,7 +508,7 @@ def _updateAttributes(resp)
     events +=    [name: "heatingSetpoint",             value: correctTemp(resp.target_temperature, "C")]
     events +=    [name: "temperature",                 value: correctTemp(resp.indoor_temperature, "C")]
     events +=    [name: "thermostatFanMode",           value: translateFanMode(resp.fan_speed?.toInteger(), "integer")]
-    events +=    [name: "thermostatMode",              value: translateMode(resp.operational_mode?.toInteger(), "integer")]
+    events +=    [name: "thermostatMode",              value: resp.power_state ? translateMode(resp.operational_mode?.toInteger(), "integer") : "off"]
     events +=    [name: "thermostatOperatingState",    value: resp.power_state ? "on" : "off" ]
     events +=    [name: "thermostatSetpoint",          value: correctTemp(resp.target_temperature, "C")]
     events +=    [name: "outdoorTemperature",          value: correctTemp(resp.outdoor_temperature, "C")]
